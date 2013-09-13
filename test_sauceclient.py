@@ -12,6 +12,7 @@
 #       http://www.apache.org/licenses/LICENSE-2.0
 #
 
+import httplib
 import os
 import random
 import unittest
@@ -114,6 +115,15 @@ class TestJobs(unittest.TestCase):
         self.assertIsInstance(job_attributes, dict)
         self.assertIn('id', job_attributes)
         self.assertEqual(job_attributes['id'], TEST_JOB_ID)
+
+    def test_get_auth_token(self):
+        """ Verify that the auth token is valid """
+        token = self.sc.jobs.get_auth_token(TEST_JOB_ID)
+        url = '/jobs/%s?auth=%s' % (TEST_JOB_ID, token)
+        connection = httplib.HTTPSConnection('saucelabs.com')
+        connection.request('GET', url, None)
+        response = connection.getresponse()
+        self.assertEqual(response.status, 200)
 
 
 class TestProvisioning(unittest.TestCase):
